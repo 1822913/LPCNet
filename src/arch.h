@@ -33,7 +33,7 @@
 
 #ifndef ARCH_H
 #define ARCH_H
-//test
+
 #include "opus_types.h"
 #include "common.h"
 
