@@ -705,7 +705,7 @@ void process_superframe(LPCNetEncState *st, unsigned char *buf, FILE *ffeat, int
   RNN_COPY(st->vq_mem, &st->features[3][0], NB_BANDS);
   if (encode) {
     packer bits;
-    /*fprintf(stdout, "%d %d %d %d %d %d %d %d %d\n", c0_id+64, main_pitch, voiced ? modulation+4 : 0, corr_id, vq_end[0], vq_end[1], vq_end[2], vq_mid, interp_id);*/
+    fprintf(stdout, "%d %d %d %d %d %d %d %d %d\n", c0_id+64, main_pitch, voiced ? modulation+4 : 0, corr_id, vq_end[0], vq_end[1], vq_end[2], vq_mid, interp_id);
     bits_packer_init(&bits, buf, 8);
     bits_pack(&bits, c0_id+64, 7);
     bits_pack(&bits, main_pitch, 6);
