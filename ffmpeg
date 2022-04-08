@@ -1,0 +1,2 @@
+ffmpeg -i test1.wav -ar 16000 -ac 1 -f s16le -acodec pcm_s16le test1.raw
+ffmpeg -ar 16000 -ac 1 -f s16le -i test1out.raw test1out.wav
