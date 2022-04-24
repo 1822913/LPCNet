@@ -93,8 +93,8 @@ void decode_packet(float features[4][NB_TOTAL_FEATURES], float *vq_mem, const un
   float frame_corr;
   float sign;
   unpacker bits;
-  
   bits_unpacker_init(&bits, buf, 8);
+
   c0_id = bits_unpack(&bits, 7);
   main_pitch = bits_unpack(&bits, 6);
   modulation = bits_unpack(&bits, 3);
@@ -104,7 +104,24 @@ void decode_packet(float features[4][NB_TOTAL_FEATURES], float *vq_mem, const un
   vq_end[2] = bits_unpack(&bits, 10);
   vq_mid = bits_unpack(&bits, 13);
   interp_id = bits_unpack(&bits, 3);
-  /*fprintf(stdout, "%d %d %d %d %d %d %d %d %d\n", c0_id, main_pitch, modulation, corr_id, vq_end[0], vq_end[1], vq_end[2], vq_mid, interp_id);*/
+
+//  static int hilf = 0;
+//  if (hilf % 10 == 0){
+//     c0_id = 0;
+//     main_pitch = 0;
+//     modulation = 0;
+//     corr_id = 0;
+//     vq_end[0] = 0;
+//     vq_end[1] = 0;
+//     vq_end[2] = 0;
+//     vq_mid = 0;
+//     interp_id = 0;
+//  }
+//  hilf ++;
+  //printf("%X, %X, %X, %X, %X, %X, %X, %X\n", bits.chars[0], bits.chars[1], bits.chars[2], bits.chars[3], bits.chars[4], bits.chars[5], bits.chars[6], bits.chars[7]);
+  //printf("%X, %X, %X, %X, %X, %X, %X, %X, %X\n", c0_id, main_pitch, modulation, corr_id, vq_end[0], vq_end[1], vq_end[2], vq_mid, interp_id);
+
+/*fprintf(stdout, "%d %d %d %d %d %d %d %d %d\n", c0_id, main_pitch, modulation, corr_id, vq_end[0], vq_end[1], vq_end[2], vq_mid, interp_id);*/
 
   
   for (i=0;i<4;i++) RNN_CLEAR(&features[i][0], NB_TOTAL_FEATURES);
