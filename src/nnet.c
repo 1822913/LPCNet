@@ -467,7 +467,7 @@ void compute_embedding(const EmbeddingLayer *layer, float *output, int input)
    /*if (layer->dim == 64) printf("%d\n", input);*/
    for (i=0;i<layer->dim;i++)
    {
-      output[i] = layer->embedding_weights[input*layer->dim + i];
+      output[i] = layer->embedding_weights[input*layer->dim + i]; //lookup
    }    
 }
 

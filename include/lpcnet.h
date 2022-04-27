@@ -188,4 +188,6 @@ LPCNET_EXPORT int lpcnet_plc_update(LPCNetPLCState *st, short *pcm);
 
 LPCNET_EXPORT int lpcnet_plc_conceal(LPCNetPLCState *st, short *pcm);
 
+LPCNET_EXPORT void sim_packetloss(unsigned char[8]);
+
 #endif

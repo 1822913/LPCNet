@@ -43,18 +43,27 @@
 int main(int argc, char **argv) {
     int mode;
     int plc_percent=0;
+    int packetloss = 0;
+    int rate = 1; //not 0 because behaviour of % 0 operation is undefined
     FILE *fin, *fout;
-    if (argc != 4 && !(argc == 5 && strcmp(argv[1], "-plc") == 0))
+    if (argc != 4 && !(argc == 5 && strcmp(argv[1], "-plc") == 0) && !(argc == 5 && strcmp(argv[1], "-decode_pl") == 0))
     {
         fprintf(stderr, "usage: lpcnet_demo -encode <input.pcm> <compressed.lpcnet>\n");
         fprintf(stderr, "       lpcnet_demo -decode <compressed.lpcnet> <output.pcm>\n");
+        fprintf(stderr, "       lpcnet_demo -decode_pl <compressed.lpcnet> <output.pcm>\n");
         fprintf(stderr, "       lpcnet_demo -features <input.pcm> <features.f32>\n");
         fprintf(stderr, "       lpcnet_demo -synthesis <features.f32> <output.pcm>\n");
         fprintf(stderr, "       lpcnet_demo -plc <percent> <input.pcm> <output.pcm>\n");
+        fprintf(stderr, "       lpcnet_demo -packetloss\n");
         return 0;
     }
     if (strcmp(argv[1], "-encode") == 0) mode=MODE_ENCODE;
     else if (strcmp(argv[1], "-decode") == 0) mode=MODE_DECODE;
+    else if (strcmp(argv[1], "-decode_pl") == 0) {
+        mode=MODE_DECODE;
+        packetloss = 1;
+        rate = atoi(argv[4]);
+    }
     else if (strcmp(argv[1], "-features") == 0) mode=MODE_FEATURES;
     else if (strcmp(argv[1], "-synthesis") == 0) mode=MODE_SYNTHESIS;
     else if (strcmp(argv[1], "-plc") == 0) {
@@ -91,6 +100,7 @@ int main(int argc, char **argv) {
         lpcnet_encoder_destroy(net);
     } else if (mode == MODE_DECODE) {
         LPCNetDecState *net;
+        int counter = 1;
         net = lpcnet_decoder_create();
         while (1) {
             unsigned char buf[LPCNET_COMPRESSED_SIZE];
@@ -98,6 +108,8 @@ int main(int argc, char **argv) {
             size_t ret;
             ret = fread(buf, sizeof(buf[0]), LPCNET_COMPRESSED_SIZE, fin);
             if (feof(fin) || ret != LPCNET_COMPRESSED_SIZE) break;
+            if (packetloss && counter%rate == 0) sim_packetloss(buf);
+            counter++;
             lpcnet_decode(net, buf, pcm);
             fwrite(pcm, sizeof(pcm[0]), LPCNET_PACKET_SAMPLES, fout);
         }

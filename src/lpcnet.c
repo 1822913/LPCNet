@@ -41,7 +41,7 @@
 
 #define PDF_FLOOR 0.002
 
-#define FRAME_INPUT_SIZE (NB_FEATURES + EMBED_PITCH_OUT_SIZE)
+#define FRAME_INPUT_SIZE (NB_FEATURES + EMBED_PITCH_OUT_SIZE) // 20 + 64
 
 
 #if 0
@@ -250,5 +250,13 @@ LPCNET_EXPORT int lpcnet_decode(LPCNetDecState *st, const unsigned char *buf, sh
     lpcnet_synthesize(&st->lpcnet_state, features[k], &pcm[k*FRAME_SIZE], FRAME_SIZE);
   }
   return 0;
+}
+
+LPCNET_EXPORT void sim_packetloss(unsigned char buf[8])
+{
+    int i;
+    for (i = 0; i < 8; i++){
+        buf[i] = 0;
+    }
 }
 
