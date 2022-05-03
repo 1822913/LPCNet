@@ -275,7 +275,7 @@ static int find_nearest_multi(const float *codebook, int nb_entries, const float
 }
 
 
-int quantize_diff(float *x, float *left, float *right, float *codebook, int bits, int sign, int *entry)
+int quantize_diff(float *x, float *left, float *right, float *codebook, int bits, int sign, int *entry) // features[1], vq_mem, feature[3], codebook, 12, 1, wg_mid
 {
     int i;
     int nb_entries;
@@ -289,8 +289,11 @@ int quantize_diff(float *x, float *left, float *right, float *codebook, int bits
     for (i=0;i<NB_BANDS;i++) pred[i] = pred[NB_BANDS+i] = .5*(left[i] + right[i]);
     for (i=0;i<NB_BANDS;i++) pred[2*NB_BANDS+i] = left[i];
     for (i=0;i<NB_BANDS;i++) pred[3*NB_BANDS+i] = right[i];
-    for (i=0;i<4*NB_BANDS;i++) target[i] = x[i%NB_BANDS] - pred[i];
-
+    for (i=0;i<4*NB_BANDS;i++) {
+        int tmp = 0;
+        tmp +=1;
+        target[i] = x[i%NB_BANDS] - pred[i];
+    }
     id = find_nearest_multi(codebook, nb_entries, target, NB_BANDS, NULL, sign);
     *entry = id;
     if (id >= 1<<bits) {
@@ -696,6 +699,7 @@ void process_superframe(LPCNetEncState *st, unsigned char *buf, FILE *ffeat, int
     quantize_diff(&st->features[1][0], st->vq_mem, &st->features[3][0], ceps_codebook_diff4, 12, 1, &vq_mid);
     interp_id = double_interp_search(st->features, st->vq_mem);
     perform_double_interp(st->features, st->vq_mem, interp_id);
+    interp_id ^= 4;
   }
   for (sub=0;sub<4;sub++) {
     lpc_from_cepstrum(st->lpc, st->features[sub]);
@@ -705,7 +709,7 @@ void process_superframe(LPCNetEncState *st, unsigned char *buf, FILE *ffeat, int
   RNN_COPY(st->vq_mem, &st->features[3][0], NB_BANDS);
   if (encode) {
     packer bits;
-    fprintf(stdout, "%d %d %d %d %d %d %d %d %d\n", c0_id+64, main_pitch, voiced ? modulation+4 : 0, corr_id, vq_end[0], vq_end[1], vq_end[2], vq_mid, interp_id);
+    //fprintf(stdout, "%d %d %d %d %d %d %d %d %d\n", c0_id+64, main_pitch, voiced ? modulation+4 : 0, corr_id, vq_end[0], vq_end[1], vq_end[2], vq_mid, interp_id);
     bits_packer_init(&bits, buf, 8);
     bits_pack(&bits, c0_id+64, 7);
     bits_pack(&bits, main_pitch, 6);
