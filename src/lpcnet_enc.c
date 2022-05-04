@@ -311,7 +311,7 @@ int quantize_diff(float *x, float *left, float *right, float *codebook, int bits
         }
         printf("%f\n", sqrt(err/NB_BANDS));
     }
-    
+    *entry ^= 2;
     return id;
 }
 

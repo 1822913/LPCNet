@@ -148,7 +148,7 @@ void decode_packet(float features[4][NB_TOTAL_FEATURES], float *vq_mem, const un
   for (i=0;i<NB_BANDS_1;i++) {
     features[3][i+1] = ceps_codebook1[vq_end[0]*NB_BANDS_1 + i] + ceps_codebook2[vq_end[1]*NB_BANDS_1 + i] + ceps_codebook3[vq_end[2]*NB_BANDS_1 + i];
   }
-
+  vq_mid ^= 2;
   sign = 1;
   if (vq_mid >= 4096) {
     vq_mid -= 4096;
