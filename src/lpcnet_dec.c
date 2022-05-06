@@ -77,7 +77,7 @@ unsigned int bits_unpack(unpacker *bits, int nb_bits) {
   return d;
 }
 
-void decode_packet(float features[4][NB_TOTAL_FEATURES], float *vq_mem, const unsigned char buf[8])
+void decode_packet(float features[4][NB_TOTAL_FEATURES], LPCNetDecState *st, const unsigned char buf[8])
 {
   int c0_id;
   int main_pitch;
@@ -93,6 +93,14 @@ void decode_packet(float features[4][NB_TOTAL_FEATURES], float *vq_mem, const un
   float frame_corr;
   float sign;
   unpacker bits;
+  int packet_loss = 0;
+  for (unsigned j = 0; j < 8; j++){
+      if (buf[j] == 0) packet_loss++;
+  }
+  if(packet_loss == 8) {
+      buf = st->buf_mem;
+      packet_loss = 0;
+  }
   bits_unpacker_init(&bits, buf, 8);
 
   c0_id = bits_unpack(&bits, 7);
@@ -104,7 +112,16 @@ void decode_packet(float features[4][NB_TOTAL_FEATURES], float *vq_mem, const un
   vq_end[2] = bits_unpack(&bits, 10);
   vq_mid = bits_unpack(&bits, 13);
   interp_id = bits_unpack(&bits, 3);
-
+//  if (packet_loss == 8){
+//      c0_id = st->c0_id_mem;
+//      main_pitch = st->main_pitch_mem;
+//      modulation = st->modulation_mem;
+//      corr_id = st->corr_id_mem;
+//  }
+//  st->c0_id_mem = c0_id;
+//  st->main_pitch_mem = main_pitch;
+//  st->modulation_mem = modulation;
+//  st->corr_id_mem = corr_id;
 //  static int hilf = 0;
 //  if (hilf % 10 == 0){
 //     c0_id = 0;
@@ -148,7 +165,7 @@ void decode_packet(float features[4][NB_TOTAL_FEATURES], float *vq_mem, const un
   for (i=0;i<NB_BANDS_1;i++) {
     features[3][i+1] = ceps_codebook1[vq_end[0]*NB_BANDS_1 + i] + ceps_codebook2[vq_end[1]*NB_BANDS_1 + i] + ceps_codebook3[vq_end[2]*NB_BANDS_1 + i];
   }
-  vq_mid ^= 2;
+//  vq_mid ^= 2;
   sign = 1;
   if (vq_mid >= 4096) {
     vq_mid -= 4096;
@@ -158,14 +175,15 @@ void decode_packet(float features[4][NB_TOTAL_FEATURES], float *vq_mem, const un
     features[1][i] = sign*ceps_codebook_diff4[vq_mid*NB_BANDS + i];
   }
   if ((vq_mid&MULTI_MASK) < 2) {
-    for (i=0;i<NB_BANDS;i++) features[1][i] += .5*(vq_mem[i] + features[3][i]);
+    for (i=0;i<NB_BANDS;i++) features[1][i] += .5*(st->vq_mem[i] + features[3][i]);
   } else if ((vq_mid&MULTI_MASK) == 2) {
-    for (i=0;i<NB_BANDS;i++) features[1][i] += vq_mem[i];
+    for (i=0;i<NB_BANDS;i++) features[1][i] += st->vq_mem[i];
   } else {
     for (i=0;i<NB_BANDS;i++) features[1][i] += features[3][i];
   }
   
-  perform_double_interp(features, vq_mem, interp_id);
+  perform_double_interp(features, st->vq_mem, interp_id);
 
-  RNN_COPY(vq_mem, &features[3][0], NB_BANDS);
+  RNN_COPY(st->vq_mem, &features[3][0], NB_BANDS);
+  RNN_COPY(st->buf_mem, buf, 8 * sizeof(char));
 }

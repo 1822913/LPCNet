@@ -47,7 +47,7 @@ parser.add_argument('--grua-size', metavar='<units>', default=384, type=int, hel
 parser.add_argument('--grub-size', metavar='<units>', default=64, type=int, help='number of units in GRU B (default 64)')
 parser.add_argument('--cond-size', metavar='<units>', default=256, type=int, help='number of units in conditioning network, aka frame rate network (default 256)')
 parser.add_argument('--epochs', metavar='<epochs>', default=120, type=int, help='number of epochs to train for (default 120)')
-parser.add_argument('--batch-size', metavar='<batch size>', default=128, type=int, help='batch size to use (default 128)')
+parser.add_argument('--batch-size', metavar='<batch size>', default=54, type=int, help='batch size to use (default 54)')
 parser.add_argument('--end2end', dest='flag_e2e', action='store_true', help='Enable end-to-end training (with differentiable LPC computation')
 parser.add_argument('--lr', metavar='<learning rate>', type=float, help='learning rate')
 parser.add_argument('--decay', metavar='<decay>', type=float, help='learning rate decay')
@@ -55,6 +55,7 @@ parser.add_argument('--gamma', metavar='<gamma>', type=float, help='adjust u-law
 parser.add_argument('--lookahead', metavar='<nb frames>', default=2, type=int, help='Number of look-ahead frames (default 2)')
 parser.add_argument('--logdir', metavar='<log dir>', help='directory for tensorboard log files')
 
+#Defaults fitted to my personal surroundings
 
 args = parser.parse_args()
 
@@ -139,7 +140,7 @@ frame_size = model.frame_size
 nb_features = model.nb_used_features + lpc_order
 nb_used_features = model.nb_used_features
 feature_chunk_size = 15
-pcm_chunk_size = frame_size*feature_chunk_size
+pcm_chunk_size = frame_size*feature_chunk_size #160*15 = 2400
 
 # u for unquantised, load 16 bit PCM samples and convert to mu-law
 

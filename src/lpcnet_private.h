@@ -42,6 +42,11 @@ struct LPCNetState {
 struct LPCNetDecState {
     LPCNetState lpcnet_state;
     float vq_mem[NB_BANDS];
+    const unsigned char buf_mem[8];
+//    int c0_id_mem;
+//    int main_pitch_mem;
+//    int modulation_mem;
+//    int corr_id_mem;
 };
 
 struct LPCNetEncState{
@@ -89,7 +94,7 @@ void process_superframe(LPCNetEncState *st, unsigned char *buf, FILE *ffeat, int
 
 void compute_frame_features(LPCNetEncState *st, const float *in);
 
-void decode_packet(float features[4][NB_TOTAL_FEATURES], float *vq_mem, const unsigned char buf[8]);
+void decode_packet(float features[4][NB_TOTAL_FEATURES], LPCNetDecState* st, const unsigned char buf[8]);
 
 void run_frame_network(LPCNetState *lpcnet, float *gru_a_condition, float *gru_b_condition, float *lpc, const float *features);
 void lpcnet_synthesize_tail_impl(LPCNetState *lpcnet, short *output, int N, int preload);
