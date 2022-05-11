@@ -27,13 +27,15 @@
 
 import math
 import tensorflow as tf
-from tensorflow.keras.models import Model
+from tensorflow.keras.models import Model, Sequential
 from tensorflow.keras.layers import Input, GRU, Dense, Embedding, Reshape, Concatenate, Lambda, Conv1D, Multiply, Add, Bidirectional, MaxPooling1D, Activation, GaussianNoise
 from tensorflow.compat.v1.keras.layers import CuDNNGRU
 from tensorflow.keras import backend as K
 from tensorflow.keras.constraints import Constraint
 from tensorflow.keras.initializers import Initializer
 from tensorflow.keras.callbacks import Callback
+from ann_visualizer.visualize import ann_viz
+import visualkeras
 from mdense import MDense
 import numpy as np
 import h5py
@@ -257,6 +259,19 @@ def new_lpcnet_model(rnn_units1=384, rnn_units2=16, nb_used_features=20, batch_s
         fdense2.trainable = False
 
     cfeat = fdense2(fdense1(cfeat))
+    # visu = Model(cfeat)
+    # visu.compile()
+    # visu.summary()
+    # visualkeras.layered_view(visu).show()
+
+
+    # visu = Sequential()
+    # visu.add(fconv1)
+    # visu.add(fconv2)
+    # visu.add(fdense1)
+    # visu.add(fdense2)
+    # visualkeras.layered_view(visu).show()
+    # ann_viz(visu, view=True, filename="FRN.gv", title="FRN LPCNet")
 
     error_calc = Lambda(lambda x: tf_l2u(x[0] - tf.roll(x[1],1,axis = 1)))
     if flag_e2e:
@@ -272,7 +287,7 @@ def new_lpcnet_model(rnn_units1=384, rnn_units2=16, nb_used_features=20, batch_s
     cpcm_decoder = Reshape((-1, embed_size*3))(embed(dpcm))
 
     
-    rep = Lambda(lambda x: K.repeat_elements(x, frame_size, 1))
+    rep = Lambda(lambda x: K.repeat_elements(x, frame_size, 1)) #Constant cfeat over 160 samples (conditioning vector)
 
     quant = quant_regularizer if quantize else None
 

@@ -97,6 +97,7 @@ void decode_packet(float features[4][NB_TOTAL_FEATURES], LPCNetDecState *st, con
   for (unsigned j = 0; j < 8; j++){
       if (buf[j] == 0) packet_loss++;
   }
+//  packet_loss = 0;
   if(packet_loss == 8) {
       buf = st->buf_mem;
       packet_loss = 0;
@@ -185,5 +186,5 @@ void decode_packet(float features[4][NB_TOTAL_FEATURES], LPCNetDecState *st, con
   perform_double_interp(features, st->vq_mem, interp_id);
 
   RNN_COPY(st->vq_mem, &features[3][0], NB_BANDS);
-  RNN_COPY(st->buf_mem, buf, 8 * sizeof(char));
+  RNN_COPY(st->buf_mem, buf, 8);
 }
