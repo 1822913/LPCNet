@@ -718,6 +718,7 @@ void process_superframe(LPCNetEncState *st, unsigned char *buf, FILE *ffeat, int
     bits_pack(&bits, interp_id, 3);
     if (ffeat) fwrite(buf, 1, 8, ffeat);
   } else if (ffeat) {
+    if ((rand() % 20) == 1) set_zero(st->features);
     for (i=0;i<4;i++) {
       fwrite(st->features[i], sizeof(float), NB_TOTAL_FEATURES, ffeat);
     }
@@ -899,4 +900,10 @@ int lpcnet_compute_single_frame_features(LPCNetEncState *st, const short *pcm, f
   process_single_frame(st, NULL);
   RNN_COPY(features, &st->features[0][0], NB_TOTAL_FEATURES);
   return 0;
+}
+
+void set_zero(float features[4][NB_TOTAL_FEATURES]){
+    for (int i = 0; i < 4; i++){
+        for (int j = 0; j < NB_TOTAL_FEATURES; j++) features[i][j] = 0;
+    }
 }

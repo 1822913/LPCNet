@@ -34,7 +34,6 @@ from tensorflow.keras import backend as K
 from tensorflow.keras.constraints import Constraint
 from tensorflow.keras.initializers import Initializer
 from tensorflow.keras.callbacks import Callback
-from ann_visualizer.visualize import ann_viz
 import visualkeras
 from mdense import MDense
 import numpy as np
@@ -259,19 +258,6 @@ def new_lpcnet_model(rnn_units1=384, rnn_units2=16, nb_used_features=20, batch_s
         fdense2.trainable = False
 
     cfeat = fdense2(fdense1(cfeat))
-    # visu = Model(cfeat)
-    # visu.compile()
-    # visu.summary()
-    # visualkeras.layered_view(visu).show()
-
-
-    # visu = Sequential()
-    # visu.add(fconv1)
-    # visu.add(fconv2)
-    # visu.add(fdense1)
-    # visu.add(fdense2)
-    # visualkeras.layered_view(visu).show()
-    # ann_viz(visu, view=True, filename="FRN.gv", title="FRN LPCNet")
 
     error_calc = Lambda(lambda x: tf_l2u(x[0] - tf.roll(x[1],1,axis = 1)))
     if flag_e2e:
@@ -281,7 +267,7 @@ def new_lpcnet_model(rnn_units1=384, rnn_units2=16, nb_used_features=20, batch_s
     tensor_preds = diff_pred(name = "lpc2preds")([pcm,lpcoeffs])
     past_errors = error_calc([pcm,tensor_preds])
     embed = diff_Embed(name='embed_sig',initializer = PCMInit())
-    cpcm = Concatenate()([tf_l2u(pcm),tf_l2u(tensor_preds),past_errors])
+    cpcm = Concatenate()([tf_l2u(pcm),tf_l2u(tensor_preds),past_errors]) #s, p, e
     cpcm = GaussianNoise(.3)(cpcm)
     cpcm = Reshape((-1, embed_size*3))(embed(cpcm))
     cpcm_decoder = Reshape((-1, embed_size*3))(embed(dpcm))

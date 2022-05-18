@@ -29,6 +29,7 @@
 
 import argparse
 from dataloader import LPCNetLoader
+import matplotlib.pyplot as plt
 
 parser = argparse.ArgumentParser(description='Train an LPCNet model')
 
@@ -197,4 +198,5 @@ if args.logdir is not None:
     tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=logdir)
     callbacks.append(tensorboard_callback)
 
-model.fit(loader, epochs=nb_epochs, validation_split=0.0, callbacks=callbacks)
+history = model.fit(loader, epochs=nb_epochs, validation_split=0.0, callbacks=callbacks)
+
