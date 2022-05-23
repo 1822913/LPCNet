@@ -48,7 +48,7 @@ parser.add_argument('--grua-size', metavar='<units>', default=384, type=int, hel
 parser.add_argument('--grub-size', metavar='<units>', default=64, type=int, help='number of units in GRU B (default 64)')
 parser.add_argument('--cond-size', metavar='<units>', default=256, type=int, help='number of units in conditioning network, aka frame rate network (default 256)')
 parser.add_argument('--epochs', metavar='<epochs>', default=120, type=int, help='number of epochs to train for (default 120)')
-parser.add_argument('--batch-size', metavar='<batch size>', default=54, type=int, help='batch size to use (default 54)')
+parser.add_argument('--batch-size', metavar='<batch size>', default=50, type=int, help='batch size to use (default 54)')
 parser.add_argument('--end2end', dest='flag_e2e', action='store_true', help='Enable end-to-end training (with differentiable LPC computation')
 parser.add_argument('--lr', metavar='<learning rate>', type=float, help='learning rate')
 parser.add_argument('--decay', metavar='<decay>', type=float, help='learning rate decay')
@@ -164,7 +164,6 @@ features = np.lib.stride_tricks.as_strided(features, shape=(nb_frames, feature_c
                                            strides=(feature_chunk_size*nb_features*sizeof, nb_features*sizeof, sizeof))
 #features = features[:, :, :nb_used_features]
 
-
 periods = (.1 + 50*features[:,:,nb_used_features-2:nb_used_features-1]+100).astype('int16')
 #periods = np.minimum(periods, 255)
 
@@ -199,4 +198,11 @@ if args.logdir is not None:
     callbacks.append(tensorboard_callback)
 
 history = model.fit(loader, epochs=nb_epochs, validation_split=0.0, callbacks=callbacks)
-
+print(history.history.keys())
+fig, axs = plt.subplots(2, 4)
+for i, key in enumerate(list(history.history.keys())):
+    x = i // 4
+    y = i % 4
+    axs[x, y].plot(history.history[key])
+    axs[x, y].legend([key], loc='upper left')
+plt.show()

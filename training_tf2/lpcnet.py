@@ -34,7 +34,6 @@ from tensorflow.keras import backend as K
 from tensorflow.keras.constraints import Constraint
 from tensorflow.keras.initializers import Initializer
 from tensorflow.keras.callbacks import Callback
-import visualkeras
 from mdense import MDense
 import numpy as np
 import h5py

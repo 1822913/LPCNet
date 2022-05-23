@@ -586,6 +586,8 @@ void process_superframe(LPCNetEncState *st, unsigned char *buf, FILE *ffeat, int
   int vq_mid=0;
   int corr_id = 0;
   int interp_id=0;
+  static int packet_loss = 0;
+  packet_loss += 1;
   for(sub=0;sub<8;sub++) frame_weight_sum += st->frame_weight[2+sub];
   for(sub=0;sub<8;sub++) st->frame_weight[2+sub] *= (8.f/frame_weight_sum);
   for(sub=0;sub<8;sub++) {
@@ -718,7 +720,7 @@ void process_superframe(LPCNetEncState *st, unsigned char *buf, FILE *ffeat, int
     bits_pack(&bits, interp_id, 3);
     if (ffeat) fwrite(buf, 1, 8, ffeat);
   } else if (ffeat) {
-    if ((rand() % 20) == 1) set_zero(st->features);
+    if (packet_loss % 10 == 0) set_zero(st->features);
     for (i=0;i<4;i++) {
       fwrite(st->features[i], sizeof(float), NB_TOTAL_FEATURES, ffeat);
     }
