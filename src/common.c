@@ -57,7 +57,6 @@ static void single_interp(float *x, const float *left, const float *right, int i
 
 void perform_double_interp(float features[4][NB_TOTAL_FEATURES], const float *mem, int best_id) {
     int id0, id1;
-//    best_id ^= 4;
     best_id += (best_id >= FORBIDDEN_INTERP);
     id0 = best_id / 3;
     id1 = best_id % 3;

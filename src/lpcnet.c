@@ -252,6 +252,7 @@ LPCNET_EXPORT int lpcnet_decode(LPCNetDecState *st, const unsigned char *buf, sh
   return 0;
 }
 
+/* Simulates packet loss when called by setting all parameters to 0 */
 LPCNET_EXPORT void sim_packetloss(unsigned char buf[8])
 {
     int i;

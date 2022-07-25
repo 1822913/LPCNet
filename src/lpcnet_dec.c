@@ -93,13 +93,15 @@ void decode_packet(float features[4][NB_TOTAL_FEATURES], LPCNetDecState *st, con
   float frame_corr;
   float sign;
   unpacker bits;
+
+  /* Polling to detect packet loss */
   int packet_loss = 0;
   for (unsigned j = 0; j < 8; j++){
       if (buf[j] == 0) packet_loss++;
   }
-//  if(packet_loss == 10) {
+  /* Compensation 1 */
+//  if(packet_loss == 8) {
 //      buf = st->buf_mem;
-//      packet_loss = 0;
 //  }
   bits_unpacker_init(&bits, buf, 8);
 
@@ -112,35 +114,7 @@ void decode_packet(float features[4][NB_TOTAL_FEATURES], LPCNetDecState *st, con
   vq_end[2] = bits_unpack(&bits, 10);
   vq_mid = bits_unpack(&bits, 13);
   interp_id = bits_unpack(&bits, 3);
-//  if (packet_loss == 8){
-//      c0_id = st->c0_id_mem;
-//      main_pitch = st->main_pitch_mem;
-//      modulation = st->modulation_mem;
-//      corr_id = st->corr_id_mem;
-//  }
-//  st->c0_id_mem = c0_id;
-//  st->main_pitch_mem = main_pitch;
-//  st->modulation_mem = modulation;
-//  st->corr_id_mem = corr_id;
-//  static int hilf = 0;
-//  if (hilf % 10 == 0){
-//     c0_id = 0;
-//     main_pitch = 0;
-//     modulation = 0;
-//     corr_id = 0;
-//     vq_end[0] = 0;
-//     vq_end[1] = 0;
-//     vq_end[2] = 0;
-//     vq_mid = 0;
-//     interp_id = 0;
-//  }
-//  hilf ++;
-  //printf("%X, %X, %X, %X, %X, %X, %X, %X\n", bits.chars[0], bits.chars[1], bits.chars[2], bits.chars[3], bits.chars[4], bits.chars[5], bits.chars[6], bits.chars[7]);
-  //printf("%X, %X, %X, %X, %X, %X, %X, %X, %X\n", c0_id, main_pitch, modulation, corr_id, vq_end[0], vq_end[1], vq_end[2], vq_mid, interp_id);
 
-/*fprintf(stdout, "%d %d %d %d %d %d %d %d %d\n", c0_id, main_pitch, modulation, corr_id, vq_end[0], vq_end[1], vq_end[2], vq_mid, interp_id);*/
-
-  
   for (i=0;i<4;i++) RNN_CLEAR(&features[i][0], NB_TOTAL_FEATURES);
 
   modulation -= 4;
@@ -160,12 +134,11 @@ void decode_packet(float features[4][NB_TOTAL_FEATURES], LPCNetDecState *st, con
     features[sub][NB_BANDS] = .02*(p-100);
     features[sub][NB_BANDS + 1] = frame_corr-.5;
   }
-  
+
   features[3][0] = (c0_id-64)/4.;
   for (i=0;i<NB_BANDS_1;i++) {
     features[3][i+1] = ceps_codebook1[vq_end[0]*NB_BANDS_1 + i] + ceps_codebook2[vq_end[1]*NB_BANDS_1 + i] + ceps_codebook3[vq_end[2]*NB_BANDS_1 + i];
   }
-//  vq_mid ^= 2;
   sign = 1;
   if (vq_mid >= 4096) {
     vq_mid -= 4096;
@@ -181,12 +154,16 @@ void decode_packet(float features[4][NB_TOTAL_FEATURES], LPCNetDecState *st, con
   } else {
     for (i=0;i<NB_BANDS;i++) features[1][i] += features[3][i];
   }
-  
+
   perform_double_interp(features, st->vq_mem, interp_id);
+
+  /* Compensation 2 */
   if(packet_loss == 8) {
       set_zero(features);
       packet_loss = 0;
   }
   RNN_COPY(st->vq_mem, &features[3][0], NB_BANDS);
-  RNN_COPY(st->buf_mem, buf, 8);
+
+  /* Compensation 1 */
+//  RNN_COPY(st->buf_mem, buf, 8);
 }

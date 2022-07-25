@@ -307,7 +307,6 @@ int quantize_diff(float *x, float *left, float *right, float *codebook, int bits
         }
         printf("%f\n", sqrt(err/NB_BANDS));
     }
-//    *entry ^= 2;
     return id;
 }
 
@@ -697,7 +696,6 @@ void process_superframe(LPCNetEncState *st, unsigned char *buf, FILE *ffeat, int
     quantize_diff(&st->features[1][0], st->vq_mem, &st->features[3][0], ceps_codebook_diff4, 12, 1, &vq_mid);
     interp_id = double_interp_search(st->features, st->vq_mem);
     perform_double_interp(st->features, st->vq_mem, interp_id);
-//    interp_id ^= 4;
   }
   for (sub=0;sub<4;sub++) {
     lpc_from_cepstrum(st->lpc, st->features[sub]);
@@ -904,6 +902,7 @@ int lpcnet_compute_single_frame_features(LPCNetEncState *st, const short *pcm, f
   return 0;
 }
 
+/* Sets all features for a superframe to 0 to allow compensation of packet loss*/
 void set_zero(float features[4][NB_TOTAL_FEATURES]){
     for (int i = 0; i < 4; i++){
         for (int j = 0; j < NB_TOTAL_FEATURES; j++) features[i][j] = 0;

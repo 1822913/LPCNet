@@ -59,6 +59,8 @@ int main(int argc, char **argv) {
     }
     if (strcmp(argv[1], "-encode") == 0) mode=MODE_ENCODE;
     else if (strcmp(argv[1], "-decode") == 0) mode=MODE_DECODE;
+
+    /* Use packet loss simulation via command line, int argument for loss frequency */
     else if (strcmp(argv[1], "-decode_pl") == 0) {
         mode=MODE_DECODE;
         packetloss = 1;

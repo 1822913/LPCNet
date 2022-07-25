@@ -42,11 +42,9 @@ struct LPCNetState {
 struct LPCNetDecState {
     LPCNetState lpcnet_state;
     float vq_mem[NB_BANDS];
+
+    /* Compensation 1 */
     const unsigned char buf_mem[8];
-//    int c0_id_mem;
-//    int main_pitch_mem;
-//    int modulation_mem;
-//    int corr_id_mem;
 };
 
 struct LPCNetEncState{
