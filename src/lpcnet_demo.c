@@ -50,7 +50,7 @@ int main(int argc, char **argv) {
     {
         fprintf(stderr, "usage: lpcnet_demo -encode <input.pcm> <compressed.lpcnet>\n");
         fprintf(stderr, "       lpcnet_demo -decode <compressed.lpcnet> <output.pcm>\n");
-        fprintf(stderr, "       lpcnet_demo -decode_pl <compressed.lpcnet> <output.pcm>\n");
+        fprintf(stderr, "       lpcnet_demo -decode_pl <compressed.lpcnet> <output.pcm> <freq>\n");
         fprintf(stderr, "       lpcnet_demo -features <input.pcm> <features.f32>\n");
         fprintf(stderr, "       lpcnet_demo -synthesis <features.f32> <output.pcm>\n");
         fprintf(stderr, "       lpcnet_demo -plc <percent> <input.pcm> <output.pcm>\n");
