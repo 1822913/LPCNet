@@ -158,10 +158,10 @@ void decode_packet(float features[4][NB_TOTAL_FEATURES], LPCNetDecState *st, con
   perform_double_interp(features, st->vq_mem, interp_id);
 
   /* Compensation 2 */
-  if(packet_loss == 8) {
-      set_zero(features);
-      packet_loss = 0;
-  }
+//  if(packet_loss == 8) {
+//      set_zero(features);
+//      packet_loss = 0;
+//  }
   RNN_COPY(st->vq_mem, &features[3][0], NB_BANDS);
 
   /* Compensation 1 */
